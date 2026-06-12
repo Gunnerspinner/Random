@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Discord Style Web Chat</title>
+  <title>The Lounge</title>
   <style>
-    /* Discord-inspired Color Palette Variables */
     :root {
       --bg-servers: #1e1f22;
       --bg-sidebar: #2b2d31;
@@ -13,16 +12,17 @@
       --bg-input: #383a40;
       --text-main: #dbdee1;
       --text-muted: #949ba4;
-      --text-link: #00a8fc;
       --blurple: #5865f2;
       --blurple-hover: #4752c4;
+      /* Custom blue accent variable for nickname text clarity */
+      --text-blue: #00b0f4;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'GG Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body, html {
@@ -32,14 +32,13 @@
       overflow: hidden;
     }
 
-    /* Main Grid Layout */
     .app-container {
       display: flex;
       height: 100vh;
       width: 100vw;
     }
 
-    /* 1. Leftmost Server Column (Icon bar style) */
+    /* Left Server List Bar */
     .server-list {
       width: 72px;
       background-color: var(--bg-servers);
@@ -70,9 +69,9 @@
       color: white;
     }
 
-    /* 2. Channel Sidebar Column */
+    /* Sidebar Channel Column - Widened to 280px to prevent cramped text elements */
     .sidebar {
-      width: 240px;
+      width: 280px;
       background-color: var(--bg-sidebar);
       display: flex;
       flex-direction: column;
@@ -86,7 +85,6 @@
       align-items: center;
       padding: 0 16px;
       font-weight: bold;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .channel-list {
@@ -109,7 +107,6 @@
       content: "#";
       margin-right: 6px;
       font-size: 20px;
-      font-weight: 300;
     }
 
     .channel-item.active, .channel-item:hover {
@@ -117,14 +114,14 @@
       color: var(--text-main);
     }
 
-    /* Sidebar profile panel at bottom */
+    /* Profile Panel */
     .user-profile-panel {
       height: 52px;
       background-color: #232428;
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      gap: 8px;
+      padding: 0 12px;
+      gap: 10px;
     }
 
     .avatar {
@@ -153,17 +150,18 @@
       font-weight: bold;
     }
 
+    /* Target identity display input colored custom blue */
     .profile-input-box input {
       background: transparent;
       border: none;
-      color: var(--text-main);
-      font-size: 13px;
+      color: var(--text-blue);
+      font-size: 14px;
       font-weight: 600;
       outline: none;
       width: 100%;
     }
 
-    /* 3. Right Main Chat Area */
+    /* Main Chat Section */
     .chat-area {
       flex-grow: 1;
       display: flex;
@@ -178,7 +176,6 @@
       align-items: center;
       padding: 0 16px;
       font-weight: bold;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
     .chat-header::before {
@@ -188,43 +185,24 @@
       font-size: 24px;
     }
 
-    /* Container holding the continuous stream of messages */
-    .messages-viewport {
+    /* Container matching your targeted loop styling rule */
+    #fbMessages {
       flex-grow: 1;
       padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 8px;
     }
 
-    /* Individual message box styled like Discord standard chats */
+    /* The target class matches your literal script layout */
     .msg {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      line-height: 1.4;
-    }
-
-    .msg-user {
-      color: #f2f3f5;
-      font-weight: 500;
-      font-size: 14px;
-      margin-bottom: 2px;
-      cursor: pointer;
-    }
-
-    .msg-user:hover {
-      text-decoration: underline;
-    }
-
-    .msg-text {
-      color: var(--text-main);
-      font-size: 15px;
       word-break: break-word;
+      font-size: 15px;
+      line-height: 1.4;
+      color: var(--text-main);
     }
 
-    /* Chat input section fixed at base */
     .chat-input-wrapper {
       padding: 0 16px 24px 16px;
     }
@@ -260,14 +238,12 @@
       cursor: pointer;
       font-weight: 500;
       font-size: 13px;
-      transition: background 0.1s ease;
     }
 
     .send-btn:hover {
       background-color: var(--blurple-hover);
     }
 
-    /* Scrollbar Customization */
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -284,20 +260,17 @@
 
   <div class="app-container">
     
-    <!-- Server List Sidebar -->
     <div class="server-list">
-      <div class="server-icon active">G</div>
+      <div class="server-icon active">L</div>
     </div>
 
-    <!-- Sub-navigation Channel Sidebar -->
     <div class="sidebar">
       <div>
-        <div class="sidebar-header">Galaxia Servers</div>
+        <div class="sidebar-header">The Lounge</div>
         <div class="channel-list">
           <div class="channel-item active">general</div>
         </div>
       </div>
-      
       
       <div class="user-profile-panel">
         <div class="avatar" id="avatarIcon">U</div>
@@ -308,14 +281,12 @@
       </div>
     </div>
 
-    <!-- Main Message Delivery Space -->
     <div class="chat-area">
       <div class="chat-header">general</div>
       
-      <!-- Messages are dynamically injected inside this container -->
-      <div class="messages-viewport" id="fbMessages"></div>
+      <!-- Your explicit target container -->
+      <div id="fbMessages"></div>
 
-      <!-- Control area containing message field -->
       <div class="chat-input-wrapper">
         <div class="input-container">
           <input type="text" id="fbInput" placeholder="Message #general" onkeydown="if(event.key === 'Enter') window.sendFB()">
@@ -326,53 +297,34 @@
 
   </div>
 
-  <!-- Realtime Firebase Integration Logic Module -->
+  <!-- Your code block restored exactly -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const app = initializeApp({
-      apiKey: "AIzaSyCPLk7btD2izv-d0u8GrlQV2VIwphrSkMU",
-      databaseURL: "https://galaxia-chat-servers-2-default-rtdb.firebaseio.com"
+  const app=initializeApp({
+    apiKey:"AIzaSyCPLk7btD2izv-d0u8GrlQV2VIwphrSkMU",
+    databaseURL:"https://galaxia-chat-servers-2-default-rtdb.firebaseio.com"
+  });
+  const db=getDatabase(app);
+  const chatRef=ref(db,"messages");
+
+  onValue(chatRef,s=>{
+    fbMessages.innerHTML="";
+    s.forEach(c=>{
+      const m=c.val();
+      fbMessages.innerHTML+=`<div class="msg">${m.user}: ${m.text}</div>`;
     });
-    const db = getDatabase(app);
-    const chatRef = ref(db, "messages");
+    fbMessages.scrollTop=fbMessages.scrollHeight;
+  });
 
-    // Dynamic UI data synchronization loop
-    onValue(chatRef, s => {
-      fbMessages.innerHTML = "";
-      s.forEach(c => {
-        const m = c.val();
-        // Structured into standard Discord multi-tier elements
-        fbMessages.innerHTML += `
-          <div class="msg">
-            <span class="msg-user">${escapeHTML(m.user || "User")}</span>
-            <span class="msg-text">${escapeHTML(m.text)}</span>
-          </div>
-        `;
-      });
-      fbMessages.scrollTop = fbMessages.scrollHeight;
-    });
-
-    // Message transmission transaction handler
-    window.sendFB = () => {
-      if (!fbInput.value.trim()) return;
-      push(chatRef, { 
-        user: fbName.value.trim() || "User", 
-        text: fbInput.value 
-      });
-      fbInput.value = "";
-    };
-
-    // Helper utility to sanitize values against basic XSS vectors
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
-    }
+  window.sendFB=()=>{
+    if(!fbInput.value)return;
+    push(chatRef,{user:fbName.value||"User",text:fbInput.value});
+    fbInput.value="";
+  };
   </script>
 
-  <!-- Non-modular JavaScript helpers -->
   <script>
     function updateAvatarIcon(val) {
       const icon = document.getElementById('avatarIcon');
