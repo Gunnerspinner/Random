@@ -1,335 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Lounge</title>
-  <style>
-    :root {
-      --bg-servers: #1e1f22;
-      --bg-sidebar: #2b2d31;
-      --bg-chat: #313338;
-      --bg-input: #383a40;
-      --text-main: #dbdee1;
-      --text-muted: #949ba4;
-      --blurple: #5865f2;
-      --blurple-hover: #4752c4;
-      /* Custom blue accent variable for nickname text clarity */
-      --text-blue: #00b0f4;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body, html {
-      height: 100%;
-      background-color: var(--bg-chat);
-      color: var(--text-main);
-      overflow: hidden;
-    }
-
-    .app-container {
-      display: flex;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    /* Left Server List Bar */
-    .server-list {
-      width: 72px;
-      background-color: var(--bg-servers);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 12px;
-      gap: 8px;
-    }
-
-    .server-icon {
-      width: 48px;
-      height: 48px;
-      background-color: var(--bg-chat);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: var(--blurple);
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .server-icon:hover, .server-icon.active {
-      border-radius: 16px;
-      background-color: var(--blurple);
-      color: white;
-    }
-
-    /* Sidebar Channel Column - Widened to 280px to prevent cramped text elements */
-    .sidebar {
-      width: 280px;
-      background-color: var(--bg-sidebar);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .sidebar-header {
-      height: 48px;
-      border-bottom: 1px solid #1f2023;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      font-weight: bold;
-    }
-
-    .channel-list {
-      padding: 8px;
-      flex-grow: 1;
-    }
-
-    .channel-item {
-      padding: 6px 8px;
-      border-radius: 4px;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      margin-bottom: 2px;
-      font-size: 15px;
-    }
-
-    .channel-item::before {
-      content: "#";
-      margin-right: 6px;
-      font-size: 20px;
-    }
-
-    .channel-item.active, .channel-item:hover {
-      background-color: rgba(78, 80, 88, 0.3);
-      color: var(--text-main);
-    }
-
-    /* Profile Panel */
-    .user-profile-panel {
-      height: 52px;
-      background-color: #232428;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: var(--blurple);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: white;
-    }
-
-    .profile-input-box {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-    }
-
-    .profile-input-box label {
-      font-size: 10px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: bold;
-    }
-
-    /* Target identity display input colored custom blue */
-    .profile-input-box input {
-      background: transparent;
-      border: none;
-      color: var(--text-blue);
-      font-size: 14px;
-      font-weight: 600;
-      outline: none;
-      width: 100%;
-    }
-
-    /* Main Chat Section */
-    .chat-area {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      background-color: var(--bg-chat);
-    }
-
-    .chat-header {
-      height: 48px;
-      border-bottom: 1px solid #26272b;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      font-weight: bold;
-    }
-
-    .chat-header::before {
-      content: "#";
-      color: var(--text-muted);
-      margin-right: 8px;
-      font-size: 24px;
-    }
-
-    /* Container matching your targeted loop styling rule */
-    #fbMessages {
-      flex-grow: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* The target class matches your literal script layout */
-    .msg {
-      word-break: break-word;
-      font-size: 15px;
-      line-height: 1.4;
-      color: var(--text-main);
-    }
-
-    .chat-input-wrapper {
-      padding: 0 16px 24px 16px;
-    }
-
-    .input-container {
-      background-color: var(--bg-input);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      height: 44px;
-    }
-
-    .input-container input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-main);
-      width: 100%;
-      font-size: 15px;
-    }
-
-    .input-container input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .send-btn {
-      background-color: var(--blurple);
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 13px;
-    }
-
-    .send-btn:hover {
-      background-color: var(--blurple-hover);
-    }
-
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #2e3035;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1a1b1e;
-      border-radius: 4px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GunSpin Overdrive: Future Terminal</title>
+    <style>
+        body { margin: 0; background: #030308; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; user-select: none; }
+        #game-container { position: relative; width: 900px; height: 520px; background: #050510; border: 2px solid #00f0ff; border-radius: 16px; box-shadow: 0 0 30px rgba(0,240,255,0.15); cursor: pointer; }
+        canvas { display: block; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; box-sizing: border-box; }
+        .hud { position: absolute; font-family: monospace; font-size: 16px; font-weight: 900; text-shadow: 0 0 8px #000; }
+        #dist-ui { top: 20px; left: 20px; color: #00f0ff; border-left: 3px solid #00f0ff; padding-left: 8px; }
+        #bank-ui { top: 50px; left: 20px; color: #ff007f; border-left: 3px solid #ff007f; padding-left: 8px; }
+        #ammo-ui { top: 20px; right: 20px; color: #ff007f; border-right: 3px solid #ff007f; padding-right: 8px; }
+        #slowmo-alert { position: absolute; top: 28%; width: 100%; text-align: center; font-size: 26px; font-weight: 900; color: #ff007f; text-shadow: 0 0 15px #ff007f; display: none; }
+        #shop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #080818 0%, #020206 100%); display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-radius: 14px; box-sizing: border-box; padding: 15px; z-index: 10; }
+        .lbl { font-size: 10px; color: #00f0ff; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin: 2px; }
+        .row { display: flex; gap: 6px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .card { background: rgba(16,16,38,0.6); border: 1px solid rgba(0,240,255,0.25); border-radius: 6px; padding: 6px; width: 130px; text-align: center; cursor: pointer; pointer-events: auto; }
+        .card.active { border-color: #00f0ff; background: #151535; box-shadow: 0 0 12px rgba(0,240,255,0.3); }
+        .c-name { font-weight: 900; font-size: 11px; color: #fff; }
+        .c-stat { font-size: 9px; font-weight: bold; color: #00ffcc; margin-top: 2px; font-family: monospace; }
+        .locked { opacity: 0.4; border-color: rgba(255,255,255,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; }
+        .item { background: rgba(16,16,38,0.6); border: 1px solid rgba(255,0,127,0.25); border-radius: 6px; padding: 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; }
+        .item:hover:not(.disabled) { border-color: #ff007f; background: rgba(30,15,40,0.6); }
+        .item.disabled { opacity: 0.25; cursor: not-allowed; border-color: rgba(255,255,255,0.05); }
+        .i-name { font-weight: 800; font-size: 11px; color: #00f0ff; }
+        .i-lvl { font-size: 9px; color: #888; font-family: monospace; }
+        .i-cost { color: #ff007f; font-size: 9px; font-weight: bold; margin-top: 2px; font-family: monospace; background: rgba(255,0,127,0.1); padding: 1px 5px; border-radius: 4px; }
+        .btn-blk { display: flex; gap: 20px; align-items: center; border-top: 1px solid rgba(0,240,255,0.1); width: 100%; justify-content: center; padding-top: 8px; }
+        #launch-btn { background: linear-gradient(45deg,#00f0ff,#ff007f); color: #fff; border: none; padding: 10px 50px; font-size: 15px; font-weight: 900; border-radius: 6px; cursor: pointer; pointer-events: auto; }
+        #rebirth-btn { background: rgba(113,88,226,0.1); color: #fff; border: 1px solid #7158e2; padding: 8px 20px; font-size: 11px; font-weight: 900; border-radius: 6px; cursor: pointer; pointer-events: auto; }
+        #rebirth-btn.disabled { opacity: 0.25; cursor: not-allowed; border-color: #222; }
+    </style>
 </head>
 <body>
-
-  <div class="app-container">
-    
-    <div class="server-list">
-      <div class="server-icon active">L</div>
+<div id="game-container">
+    <canvas id="gameCanvas" width="900" height="520"></canvas>
+    <div id="ui-layer">
+        <div id="dist-ui" class="hud">DISTANCE // 0000m</div>
+        <div id="bank-ui" class="hud">CREDITS // 0000</div>
+        <div id="ammo-ui" class="hud">AMMO // 0/0</div>
+        <div id="slowmo-alert">FINAL ROUND // TACTICAL BURST</div>
     </div>
-
-    <div class="sidebar">
-      <div>
-        <div class="sidebar-header">The Lounge</div>
-        <div class="channel-list">
-          <div class="channel-item active">general</div>
+    <div id="shop">
+        <div style="text-align:center; border-bottom:1px solid rgba(0,240,255,0.15); width:100%; padding-bottom:4px;">
+            <h1 style="margin:0;font-size:22px;color:#00f0ff;letter-spacing:4px;">TERMINAL: OVERDRIVE</h1>
+            <div style="font-size:12px;color:#ff007f;margin-top:2px;font-weight:bold;font-family:monospace;">BANK: <span id="ui-wallet">0</span> CR | SHARDS: <span id="ui-shards" style="color:#00ffcc;">0</span></div>
+            <div id="last-run" style="font-size:10px;color:#00ffcc;font-family:monospace;margin-top:2px;display:none;"></div>
         </div>
-      </div>
-      
-      <div class="user-profile-panel">
-        <div class="avatar" id="avatarIcon">U</div>
-        <div class="profile-input-box">
-          <label for="fbName">My Nickname</label>
-          <input type="text" id="fbName" value="User" placeholder="Change name..." oninput="updateAvatarIcon(this.value)">
-        </div>
-      </div>
+        <div class="lbl">Armory Matrix</div><div class="row" id="weap-row"></div>
+        <div class="lbl">Simulation Grid</div><div class="row" id="map-row"></div>
+        <div class="lbl">Hardware Modifiers</div><div class="grid" id="up-grid"></div>
+        <div class="btn-blk"><button id="rebirth-btn" onclick="prestige()">REBIRTH</button><button id="launch-btn" onclick="start()">LAUNCH</button></div>
     </div>
-
-    <div class="chat-area">
-      <div class="chat-header">general</div>
-      
-      <!-- Your explicit target container -->
-      <div id="fbMessages"></div>
-
-      <div class="chat-input-wrapper">
-        <div class="input-container">
-          <input type="text" id="fbInput" placeholder="Message #general" onkeydown="if(event.key === 'Enter') window.sendFB()">
-          <button class="send-btn" onclick="window.sendFB()">Send</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Your code block restored exactly -->
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-  const app=initializeApp({
-    apiKey:"AIzaSyCPLk7btD2izv-d0u8GrlQV2VIwphrSkMU",
-    databaseURL:"https://galaxia-chat-servers-2-default-rtdb.firebaseio.com"
-  });
-  const db=getDatabase(app);
-  const chatRef=ref(db,"messages");
-
-  onValue(chatRef,s=>{
-    fbMessages.innerHTML="";
-    s.forEach(c=>{
-      const m=c.val();
-      fbMessages.innerHTML+=`<div class="msg">${m.user}: ${m.text}</div>`;
-    });
-    fbMessages.scrollTop=fbMessages.scrollHeight;
-  });
-
-  window.sendFB=()=>{
-    if(!fbInput.value)return;
-    push(chatRef,{user:fbName.value||"User",text:fbInput.value});
-    fbInput.value="";
-  };
-  </script>
-
-  <script>
-    function updateAvatarIcon(val) {
-      const icon = document.getElementById('avatarIcon');
-      icon.innerText = val.trim() ? val.trim().charAt(0).toUpperCase() : 'U';
-    }
-  </script>
-</body>
-</html>
+</div>
+<script>
+    const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
+    let state = 'SHOP', wallet = 0, payout = 0, cameraX = 0, cameraY = 0, cameraX_real = 0, cameraY_real = 0, tScale = 1.0, isSlow = false, shards = 0;
+    const weapons = {
+        revolver: { name: "Six-Shooter", open: true, cost: 0, ammo: 3, force: 8.5, draw: c => { c.fillStyle = "#7f8c8d"; c.fillRect(-22, -3, 24, 6); c.fillStyle = "#34495e"; c.fillRect(-6, -6, 12, 11); c.fillStyle = "#2c3e50"; c.fillRect(-6, 3, 5, 12); } },
+        shotgun: { name: "Boomstick", open: false, cost: 100, ammo: 2, force: 14.0, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-34, -5, 36, 7); c.fillStyle = "#7f8c8d"; c.fillRect(-34, -5, 14, 3); c.fillStyle = "#d35400"; c.fillRect(-12, -3, 14, 7); c.fillStyle = "#e67e22"; c.fillRect(-22, 2, 10, 12); } },
+        uzi: { name: "Micro Uzi", open: false, cost: 250, ammo: 6, force: 7.2, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-16, -8, 24, 11); c.fillStyle = "#7f8c8d"; c.fillRect(-12, -5, 18, 3); c.fillStyle = "#1a252f"; c.fillRect(-4, 3, 6, 14); } },
+        magnum: { name: "The Equalizer", open: false, cost: 400, ammo: 4, force: 12.5, draw: c => { c.fillStyle = "#bdc3c7"; c.fillRect(-32, -5, 34, 9); c.fillStyle = "#7f8c8d"; c.fillRect(-8, -8, 14, 14); c.fillStyle = "#2c3e50"; c.fillRect(-8, 6, 6, 15); } },
+        vector: { name: "Vector X", open: false, cost: 750, ammo: 8, force: 8.5, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-20, -11, 28, 15); c.fillStyle = "#7f8c8d"; c.fillRect(-24, -6, 6, 4); c.fillStyle = "#111111"; c.fillRect(-8, 4, 8, 16); } }
+    };
+    let curWeap = 'revolver';
+    const maps = {
+        hills: { name: "Neon Hills", open: true, cost: 0, grav: 0.24, color: "#00f0ff", fn: x => Math.sin(x * 0.002) * 60 + Math.cos(x * 0.005) * 20 },
+        valley: { name: "Cyber Valley", open: false, cost: 120, grav: 0.38, color: "#ff007f", fn: x => Math.sin(x * 0.003) * 90 + Math.sin(x * 0.001) * 40 },
+        orbit: { name: "Lunar Orbit", open: false, cost: 300, grav: 0.10, color: "#00ffcc", fn: x => Math.sin(x * 0.001) * 120 + Math.cos(x * 0.0005) * 40 },
+        rift: { name: "Plasma Rift", open: false, cost: 500, grav: 0.32, color: "#e67e22", fn: x => Math.abs(Math.sin(x * 0.004)) * 100 }
+    };
+    let curMap = 'hills';
+    const upgrades = {
+        ammo: { name: "Magazine", lvl: 1, base: 20, max: 100 },
+        power: { name: "Propulsion", lvl: 1, base: 25, max: 100 },
+        bounce: { name: "Deflection", lvl: 1, base: 20, max: 100 },
+        cash: { name: "Data Cache", lvl: 1, base: 30, max: 100 }
+    };
+    const gun = { x: 150, y: 200, vx: 0, vy: 0, angle: 0, vAngle: 0, ammo: 0, max: 0 };
+    let parts = [], shells = [], rings = [];
+    function getGround(x) { return 400 + maps[curMap].fn(x); }
+    function load() { try { const s = localStorage.getItem('gs_save'); if(s) { const d = JSON.parse(s); wallet = d.w||0; shards = d.sh||0; curWeap = d.cw||'revolver'; curMap = d.cm||'hills'; for(let k in upgrades) upgrades[k].lvl = d.u[k]||1; for(let k in weapons) weapons[k].open = d.wo[k]!==undefined?d.wo[k]:weapons[k].open; for(let k in maps) maps[k].open = d.mo[k]!==undefined?d.mo[k]:maps[k].open; } } catch(e){} }
+    function save() { try { const wo={}, mo={}, u={}; for(let k in weapons) wo[k]=weapons[k].open; for(let k in maps) mo[k]=maps[k].open; for(let k in upgrades) u[k]=upgrades[k].lvl; localStorage.setItem('gs_save', JSON.stringify({w:wallet,sh:shards,cw:curWeap,cm:curMap,u,wo,mo})); } catch(e){} }
+    function prestige() { if(wallet < 2500) return; wallet = 0; shards++; for(let k in upgrades) upgrades[k].lvl = 1; for(let k in weapons) if(k!=='revolver') weapons[k].open = false; for(let k in maps) if(k!=='hills') maps[k].open = false; curWeap = 'revolver'; curMap = 'hills'; save(); sync(); }
+    function physics() {
+        if (state !== 'RUNNING') return; const m = maps[curMap]; let dt = tScale;
+        if (gun.ammo === 0 && isSlow) { if (tScale > 0.75) tScale -= 0.05; document.getElementById('slowmo-alert').style.display = 'block'; }
+        else { tScale = 1.0; document.getElementById('slowmo-alert').style.display = 'none'; }
+        gun.vy += m.grav * dt; gun.x += gun.vx * dt; gun.y += gun.vy * dt; gun.angle += gun.vAngle * dt;
+        gun.vx *= Math.pow(0.994, dt); gun.vy *= Math.pow(0.996, dt); gun.vAngle *= Math.pow(0.985, dt);
+Use code with caution.
+rings.forEach(r => { if(r.a) { let dx=gun.x-r.x, dy=gun.y-r.y, d=Math.sqrt(dxdx+dydy); if(d<42) { r.a=false; gun.vx+=14; gun.vy=-4; for(let i=0;i<10;i++) parts.push({x:r.x,y:r.y,vx:(Math.random()-0.5)8,vy:(Math.random()-0.5)8,l:20}); } } });
+let ground = getGround(gun.x);
+if (gun.y + 10 >= ground) {
+gun.y = ground - 10; let dx = 1, dy = getGround(gun.x + dx) - getGround(gun.x - dx), len = Math.sqrt(dydy + 1), nx = -dy/len, ny = 1/len, dot = gun.vxnx + gun.vyny;
+if (gun.vy > 0.4) { let b = Math.min(0.95, 0.38 * (1 + (upgrades.bounce.lvl - 1) * 0.08)); gun.vx = (gun.vx - 2 * dot * nx) * b; gun.vy = (gun.vy - 2 * dot * ny) * b; gun.vAngle += gun.vx * 0.012; }
+else { gun.vy = 0; gun.vx = 0.93; gun.vAngle = 0.85; }
+}
+cameraX_real = cameraX_real + (gun.x - 200 - cameraX_real) * 0.1 * dt; cameraY_real = cameraY_real + (gun.y - 240 - cameraY_real) * 0.1 * dt;
+cameraX = cameraX_real; cameraY = cameraY_real;
+let dist = Math.max(0, Math.floor(gun.x / 10) - 15); payout = Math.floor((dist + (upgrades.cash.lvl - 1) * 10) * (1 + shards * 0.2));
+document.getElementById('dist-ui').innerText = DISTANCE // ${String(dist).padStart(4,'0')}m; document.getElementById('bank-ui').innerText = CREDITS // ${String(payout).padStart(4,'0')}; document.getElementById('ammo-ui').innerText = AMMO // ${gun.ammo}/${gun.max};
+parts.forEach((p, i) => { p.x += p.vx * dt; p.y += p.vy * dt; p.l -= dt; if (p.l <= 0) parts.splice(i, 1); });
+shells.forEach((s, i) => { s.vy += m.grav * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.a += s.va * dt; if(s.y>=getGround(s.x)){s.y=getGround(s.x);s.vy=-s.vy0.3;s.vx=0.6;} s.l -= dt; if (s.l <= 0) shells.splice(i, 1); });
+if (Math.abs(gun.vx) < 0.12 && gun.ammo === 0 && Math.abs(gun.y - getGround(gun.x)) < 15) endRun(dist);
+}
+function shoot() {
+if (gun.ammo <= 0) return; gun.ammo--; if (gun.ammo === 0) isSlow = true;
+let f = weapons[curWeap].force * (1 + (upgrades.power.lvl - 1) * 0.045) * (1 + shards * 0.15);
+gun.vx += (gun.vx <= 0 ? Math.cos(gun.angle)f0.85 : Math.cos(gun.angle)f) + Math.cos(gun.angle+Math.PI)-f; gun.vy += Math.sin(gun.angle+Math.PI)-f; gun.vAngle += (Math.random()0.25+0.12)(Math.cos(gun.angle)>0?-1:1);
+for (let i = 0; i < 6; i++) parts.push({ x: gun.x+Math.cos(gun.angle)-12, y: gun.y+Math.sin(gun.angle)-12, vx: Math.cos(gun.angle)*-6+(Math.random()-0.5)3, vy: Math.sin(gun.angle)-6+(Math.random()-0.5)*3, l: 15 });
+shells.push({ x: gun.x, y: gun.y, vx: Math.cos(gun.angle+Math.PI/2)*3+(Math.random()-0.5)2, vy: -3, a: Math.random(), va: 0.2, l: 120 });
+}
+document.getElementById('game-container').addEventListener('mousedown', e => { if(!e.target.closest('button') && !e.target.closest('.card') && !e.target.closest('.item') && state==='RUNNING') shoot(); });
+function draw() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+rings.forEach(r => { if(r.a) { ctx.save(); ctx.strokeStyle = "#00ffcc"; ctx.lineWidth = 4; ctx.shadowColor = "#00ffcc"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(r.x-cameraX, r.y-cameraY, 30, 0, Math.PI2); ctx.stroke(); ctx.restore(); } });
+ctx.strokeStyle = maps[curMap].color; ctx.lineWidth = 3; ctx.beginPath();
+for (let px = 0; px < canvas.width + 40; px += 10) { let wx = cameraX + px, wy = getGround(wx) - cameraY; if (px === 0) ctx.moveTo(px, wy); else ctx.lineTo(px, wy); } ctx.stroke();
+ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,240,255,0.06)";
+for (let gx = Math.floor(cameraX/40)*40; gx < cameraX+canvas.width+40; gx += 40) { let sx = gx-cameraX, gy = getGround(gx)-cameraY; ctx.beginPath(); ctx.moveTo(sx, gy); ctx.lineTo(sx, gy+80); ctx.stroke(); if(gx%120===0 && gx/10-15>=0) { ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="9px monospace"; ctx.fillText(${Math.floor(gx/10-15)}m, sx+4, gy+15); } }
+parts.forEach(p => { ctx.fillStyle = rgba(0,255,204,${p.l/15}); ctx.fillRect(p.x-cameraX, p.y-cameraY, 4, 4); });
+shells.forEach(s => { ctx.save(); ctx.translate(s.x-cameraX, s.y-cameraY); ctx.rotate(s.a); ctx.fillStyle = "#f1c40f"; ctx.fillRect(-3,-1,5,2); ctx.restore(); });
+ctx.save(); ctx.translate(gun.x-cameraX, gun.y-cameraY); ctx.rotate(gun.angle); weapons[curWeap].draw(ctx); ctx.restore();
+}
+function loop() { physics(); draw(); requestAnimationFrame(loop); }
+function start() {
+let w = weapons[curWeap]; gun.max = w.ammo + (upgrades.ammo.lvl - 1); gun.ammo = gun.max; gun.x = 150; gun.y = getGround(gun.x) - 30; gun.vx = 3.5; gun.vy = -2.5; gun.angle = Math.PI; gun.vAngle = -0.08; cameraX = 0; cameraY = 0; cameraX_real = 0; cameraY_real = 0; timeScale = 1.0; isSlow = false; parts = []; shells = []; rings = [];
+for (let i = 1; i <= 40; i++) rings.push({ x: 500 + i * (400 + Math.random()*300), y: 100 + Math.random()*180, a: true });
+state = 'RUNNING'; document.getElementById('shop').style.display = 'none';
+}
+function endRun(d) { state = 'SHOP'; wallet += payout; save(); document.getElementById('slowmo-alert').style.display = 'none'; document.getElementById('shop').style.display = 'flex'; let f = document.getElementById('last-run'); f.style.display = 'inline-block'; f.innerHTML = PREVIOUS RUN: ${d}m // EARNED: +${payout} CR; sync(); }
+function selectWeap(k) { let w = weapons[k]; if (!w.open && wallet >= w.cost) { wallet -= w.cost; w.open = true; curWeap = k; } else if (w.open) curWeap = k; save(); sync(); }
+function selectMap(k) { let m = maps[k]; if (!m.open && wallet >= m.cost) { wallet -= m.cost; m.open = true; curMap = k; } else if (m.open) curMap = k; save(); sync(); }
+function buyUp(k) { let u = upgrades[k], c = Math.floor(u.base + ((u.lvl - 1) * 8)); if (wallet >= c && u.lvl < u.max) { wallet -= c; u.lvl++; save(); sync(); } }
+function sync() {
+document.getElementById('ui-wallet').innerText = wallet; document.getElementById('ui-shards').innerText = shards;
+let rBtn = document.getElementById('rebirth-btn'); rBtn.className = wallet >= 2500 ? '' : 'disabled'; rBtn.innerText = wallet >= 2500 ? 'REBIRTH (+1 SHARD)' : 'REBIRTH (2500 CR)';
+let wRow = document.getElementById('weap-row'); wRow.innerHTML = ''; for (let k in weapons) wRow.innerHTML += <div class="card ${!weapons[k].open?'locked':''} ${curWeap===k?'active':''}" onclick="selectWeap('${k}')"><span class="c-name">${weapons[k].name.toUpperCase()}</span><span class="c-stat">${!weapons[k].open?weapons[k].cost+' CR':(curWeap===k?'ACTIVE':'EQUIP')}</span></div>;
+let mRow = document.getElementById('map-row'); mRow.innerHTML = ''; for (let k in maps) mRow.innerHTML += <div class="card ${!maps[k].open?'locked':''} ${curMap===k?'active':''}" onclick="selectMap('${k}')"><span class="c-name">${maps[k].name.toUpperCase()}</span><span class="c-stat">${!maps[k].open?maps[k].cost+' CR':(curMap===k?'ONLINE':'LAUNCH')}</span></div>;
+let uGrid = document.getElementById('up-grid'); uGrid.innerHTML = ''; for (let k in upgrades) { let u = upgrades[k], c = Math.floor(u.base + ((u.lvl - 1) * 8)); uGrid.innerHTML += <div class="item ${u.lvl>=u.max?'disabled':''}" onclick="buyUp('${k}')"><span class="i-name">${u.name.toUpperCase()}</span><span class="i-lvl">Lvl ${u.lvl}/100</span><span class="i-cost">${u.lvl>=u.max?'MAX':c+' CR'}</span></div>; }
+}
+load(); sync(); loop();
