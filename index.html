@@ -83,7 +83,7 @@
     const gun = { x: 150, y: 200, vx: 0, vy: 0, angle: 0, vAngle: 0, ammo: 0, max: 0 };
     let parts = [], shells = [], rings = [];
     function getGround(x) { return 400 + maps[curMap].fn(x); }
-    function load() { try { const s = localStorage.getItem('gs_save'); if(s) { const d = JSON.parse(s); wallet = d.w||0; shards = d.sh||0; curWeap = d.cw||'revolver'; curMap = d.cm||'hills'; for(let k in upgrades) upgrades[k].lvl = d.u[k]||1; for(let k in weapons) weapons[k].open = d.wo[k]!==undefined?d.wo[k]:weapons[k].open; for(let k in maps) maps[k].open = d.mo[k]!==undefined?d.mo[k]:maps[k].open; } } catch(e){} }
+    function load() { try { const s = localStorage.getItem('gs_save'); if(s) { const d = JSON.parse(s); wallet = d.w||0; shards = d.sh||0; curWeap = d.cw||'revolver'; curMap = d.cm||'hills'; for(let k in upgrades) upgrades[k].lvl = d.u[k]||1; for(let k in weapons) weapons[k].open = d.wo[k]!==undefined?d.wo[k]:weapons[k].open; for(let k in maps) maps[k].open = d.mo[k]!==undefined?d.mo[k]:maps[k].open; } } catch(e){ console.log("Storage blocked, operating inside memory bank core."); } }
     function save() { try { const wo={}, mo={}, u={}; for(let k in weapons) wo[k]=weapons[k].open; for(let k in maps) mo[k]=maps[k].open; for(let k in upgrades) u[k]=upgrades[k].lvl; localStorage.setItem('gs_save', JSON.stringify({w:wallet,sh:shards,cw:curWeap,cm:curMap,u,wo,mo})); } catch(e){} }
     function prestige() { if(wallet < 2500) return; wallet = 0; shards++; for(let k in upgrades) upgrades[k].lvl = 1; for(let k in weapons) if(k!=='revolver') weapons[k].open = false; for(let k in maps) if(k!=='hills') maps[k].open = false; curWeap = 'revolver'; curMap = 'hills'; save(); sync(); }
     function physics() {
