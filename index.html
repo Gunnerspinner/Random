@@ -2,150 +2,647 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GunSpin Overdrive: Future Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CYBER SPIN: PRESTIGE MATRIX</title>
     <style>
-        body { margin: 0; background: #030308; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; user-select: none; }
-        #game-container { position: relative; width: 900px; height: 520px; background: #050510; border: 2px solid #00f0ff; border-radius: 16px; box-shadow: 0 0 30px rgba(0,240,255,0.15); cursor: pointer; }
-        canvas { display: block; }
-        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; box-sizing: border-box; }
-        .hud { position: absolute; font-family: monospace; font-size: 16px; font-weight: 900; text-shadow: 0 0 8px #000; }
-        #dist-ui { top: 20px; left: 20px; color: #00f0ff; border-left: 3px solid #00f0ff; padding-left: 8px; }
-        #bank-ui { top: 50px; left: 20px; color: #ff007f; border-left: 3px solid #ff007f; padding-left: 8px; }
-        #ammo-ui { top: 20px; right: 20px; color: #ff007f; border-right: 3px solid #ff007f; padding-right: 8px; }
-        #slowmo-alert { position: absolute; top: 28%; width: 100%; text-align: center; font-size: 26px; font-weight: 900; color: #ff007f; text-shadow: 0 0 15px #ff007f; display: none; }
-        #shop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #080818 0%, #020206 100%); display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-radius: 14px; box-sizing: border-box; padding: 15px; z-index: 10; }
-        .lbl { font-size: 10px; color: #00f0ff; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin: 2px; }
-        .row { display: flex; gap: 6px; width: 100%; justify-content: center; flex-wrap: wrap; }
-        .card { background: rgba(16,16,38,0.6); border: 1px solid rgba(0,240,255,0.25); border-radius: 6px; padding: 6px; width: 130px; text-align: center; cursor: pointer; pointer-events: auto; }
-        .card.active { border-color: #00f0ff; background: #151535; box-shadow: 0 0 12px rgba(0,240,255,0.3); }
-        .c-name { font-weight: 900; font-size: 11px; color: #fff; }
-        .c-stat { font-size: 9px; font-weight: bold; color: #00ffcc; margin-top: 2px; font-family: monospace; }
-        .locked { opacity: 0.4; border-color: rgba(255,255,255,0.1); }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; }
-        .item { background: rgba(16,16,38,0.6); border: 1px solid rgba(255,0,127,0.25); border-radius: 6px; padding: 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; }
-        .item:hover:not(.disabled) { border-color: #ff007f; background: rgba(30,15,40,0.6); }
-        .item.disabled { opacity: 0.25; cursor: not-allowed; border-color: rgba(255,255,255,0.05); }
-        .i-name { font-weight: 800; font-size: 11px; color: #00f0ff; }
-        .i-lvl { font-size: 9px; color: #888; font-family: monospace; }
-        .i-cost { color: #ff007f; font-size: 9px; font-weight: bold; margin-top: 4px; font-family: monospace; background: rgba(255,0,127,0.1); padding: 1px 5px; border-radius: 4px; }
-        .btn-blk { display: flex; gap: 20px; align-items: center; border-top: 1px solid rgba(0,240,255,0.1); width: 100%; justify-content: center; padding-top: 8px; }
-        #launch-btn { background: linear-gradient(45deg,#00f0ff,#ff007f); color: #fff; border: none; padding: 10px 50px; font-size: 15px; font-weight: 900; border-radius: 6px; cursor: pointer; pointer-events: auto; }
-        #rebirth-btn { background: rgba(113,88,226,0.1); color: #fff; border: 1px solid #7158e2; padding: 8px 20px; font-size: 11px; font-weight: 900; border-radius: 6px; cursor: pointer; pointer-events: auto; }
-        #rebirth-btn.disabled { opacity: 0.25; cursor: not-allowed; border-color: #222; }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #04050e;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+        #game-container {
+            position: relative;
+            width: 900px;
+            height: 500px;
+            background: #070814;
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.25);
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #ui-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ffcc;
+            text-shadow: 0 0 8px rgba(0,255,204,0.6);
+            pointer-events: none;
+        }
+        #menu-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 5, 14, 0.96);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+        .menu-title {
+            font-size: 38px;
+            margin-bottom: 5px;
+            color: #ff007f;
+            text-shadow: 0 0 15px #ff007f;
+            letter-spacing: 5px;
+        }
+        .menu-subtitle {
+            font-size: 13px;
+            color: #00ffcc;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffcc;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .tab-btn {
+            background: #0f122c;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 6px 18px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: 0.2s;
+            font-size: 12px;
+        }
+        .tab-btn.active, .tab-btn:hover {
+            background: #00ffcc;
+            color: #04050e;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        .panel {
+            display: none;
+            width: 92%;
+            max-width: 780px;
+            height: 230px;
+            overflow-y: auto;
+            border: 1px solid #ff007f;
+            background: rgba(15, 18, 44, 0.6);
+            padding: 15px;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .panel.active {
+            display: block;
+        }
+        .panel::-webkit-scrollbar { width: 6px; }
+        .panel::-webkit-scrollbar-track { background: #0f122c; }
+        .panel::-webkit-scrollbar-thumb { background: #ff007f; }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .cyber-btn {
+            background: rgba(4, 5, 14, 0.85);
+            color: #fff;
+            border: 1px solid #00ffcc;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .cyber-btn:hover:not(:disabled) {
+            border-color: #ff007f;
+            box-shadow: 0 0 8px #ff007f;
+        }
+        .cyber-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .btn-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 13px;
+            color: #00ffcc;
+        }
+        .btn-meta {
+            font-size: 11px;
+            color: #8a8fa3;
+            margin-top: 4px;
+            text-align: left;
+        }
+        .price-tag {
+            color: #ff007f;
+            font-weight: bold;
+            align-self: flex-end;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+        .selection-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .select-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(4, 5, 14, 0.85);
+            border: 1px solid #00ffcc;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+        .select-item.equipped {
+            border-color: #ff007f;
+            box-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
+        }
+        .select-action-btn {
+            background: #ff007f;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        .select-action-btn:disabled {
+            background: #25283d;
+            color: #616580;
+            cursor: not-allowed;
+        }
+        .rebirth-panel {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .rebirth-desc {
+            font-size: 13px;
+            color: #8a8fa3;
+            margin-bottom: 15px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+        #rebirth-action-btn {
+            background: #3a0066;
+            color: #e000ff;
+            border: 2px solid #e000ff;
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 0 10px rgba(224, 0, 255, 0.4);
+            transition: 0.3s;
+        }
+        #rebirth-action-btn:hover:not(:disabled) {
+            background: #e000ff;
+            color: #04050e;
+            box-shadow: 0 0 20px #e000ff;
+        }
+        #rebirth-action-btn:disabled {
+            border-color: #444;
+            color: #666;
+            background: #111;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #launch-btn {
+            margin-top: 15px;
+            padding: 12px 55px;
+            font-size: 18px;
+            background: #00ffcc;
+            color: #04050e;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px #00ffcc;
+            transition: 0.3s;
+        }
+        #launch-btn:hover {
+            background: #ff007f;
+            color: white;
+            box-shadow: 0 0 20px #ff007f;
+        }
+        #clear-save-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: none;
+            border: 1px solid rgba(255,0,0,0.3);
+            color: rgba(255,0,0,0.5);
+            font-size: 9px;
+            padding: 3px 6px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        #clear-save-btn:hover {
+            border-color: red;
+            color: red;
+        }
     </style>
 </head>
 <body>
-<div id="game-container">
-    <canvas id="gameCanvas" width="900" height="520"></canvas>
-    <div id="ui-layer">
-        <div id="dist-ui" class="hud">DISTANCE // 0000m</div>
-        <div id="bank-ui" class="hud">CREDITS // 0000</div>
-        <div id="ammo-ui" class="hud">AMMO // 0/0</div>
-        <div id="slowmo-alert">FINAL ROUND // TACTICAL BURST</div>
-    </div>
-    <div id="shop">
-        <div style="text-align:center; border-bottom:1px solid rgba(0,240,255,0.15); width:100%; padding-bottom:4px;">
-            <h1 style="margin:0;font-size:22px;color:#00f0ff;letter-spacing:4px;">TERMINAL: OVERDRIVE</h1>
-            <div style="font-size:12px;color:#ff007f;margin-top:2px;font-weight:bold;font-family:monospace;">BANK: <span id="ui-wallet">0</span> CR | SHARDS: <span id="ui-shards" style="color:#00ffcc;">0</span></div>
-            <div id="last-run" style="font-size:10px;color:#00ffcc;font-family:monospace;margin-top:2px;display:none;"></div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+        
+        <div id="ui-overlay">
+            <div id="distance-ui">SECTOR NODE: 0m</div>
+            <div id="ammo-ui">CELL CHARGE: 0/0</div>
+            <div id="coins-ui">CREDITS: 0</div>
         </div>
-        <div class="lbl">Armory Matrix</div><div class="row" id="weap-row"></div>
-        <div class="lbl">Simulation Grid</div><div class="row" id="map-row"></div>
-        <div class="lbl">Hardware Modifiers</div><div class="grid" id="up-grid"></div>
-        <div class="btn-blk"><button id="rebirth-btn" onclick="prestige()">REBIRTH</button><button id="launch-btn" onclick="start()">LAUNCH</button></div>
-    </div>
-</div>
-<script>
-    const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
-    let state = 'SHOP', wallet = 0, payout = 0, cameraX = 0, cameraY = 0, cameraX_real = 0, cameraY_real = 0, tScale = 1.0, isSlow = false, shards = 0;
-    const weapons = {
-        revolver: { name: "Six-Shooter", open: true, cost: 0, ammo: 3, force: 8.5, draw: c => { c.fillStyle = "#7f8c8d"; c.fillRect(-22, -3, 24, 6); c.fillStyle = "#34495e"; c.fillRect(-6, -6, 12, 11); c.fillStyle = "#2c3e50"; c.fillRect(-6, 3, 5, 12); } },
-        shotgun: { name: "Boomstick", open: false, cost: 100, ammo: 2, force: 14.0, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-34, -5, 36, 7); c.fillStyle = "#7f8c8d"; c.fillRect(-34, -5, 14, 3); c.fillStyle = "#d35400"; c.fillRect(-12, -3, 14, 7); c.fillStyle = "#e67e22"; c.fillRect(-22, 2, 10, 12); } },
-        uzi: { name: "Micro Uzi", open: false, cost: 250, ammo: 6, force: 7.2, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-16, -8, 24, 11); c.fillStyle = "#7f8c8d"; c.fillRect(-12, -5, 18, 3); c.fillStyle = "#1a252f"; c.fillRect(-4, 3, 6, 14); } },
-        magnum: { name: "The Equalizer", open: false, cost: 400, ammo: 4, force: 12.5, draw: c => { c.fillStyle = "#bdc3c7"; c.fillRect(-32, -5, 34, 9); c.fillStyle = "#7f8c8d"; c.fillRect(-8, -8, 14, 14); c.fillStyle = "#2c3e50"; c.fillRect(-8, 6, 6, 15); } },
-        vector: { name: "Vector X", open: false, cost: 750, ammo: 8, force: 8.5, draw: c => { c.fillStyle = "#2c3e50"; c.fillRect(-20, -11, 28, 15); c.fillStyle = "#7f8c8d"; c.fillRect(-24, -6, 6, 4); c.fillStyle = "#111111"; c.fillRect(-8, 4, 8, 16); } }
-    };
-    let curWeap = 'revolver';
-    const maps = {
-        hills: { name: "Neon Hills", open: true, cost: 0, grav: 0.24, color: "#00f0ff", fn: x => Math.sin(x * 0.002) * 60 + Math.cos(x * 0.005) * 20 },
-        valley: { name: "Cyber Valley", open: false, cost: 120, grav: 0.38, color: "#ff007f", fn: x => Math.sin(x * 0.003) * 90 + Math.sin(x * 0.001) * 40 },
-        orbit: { name: "Lunar Orbit", open: false, cost: 300, grav: 0.10, color: "#00ffcc", fn: x => Math.sin(x * 0.001) * 120 + Math.cos(x * 0.0005) * 40 },
-        rift: { name: "Plasma Rift", open: false, cost: 500, grav: 0.32, color: "#e67e22", fn: x => Math.abs(Math.sin(x * 0.004)) * 100 }
-    };
-    let curMap = 'hills';
-    const upgrades = {
-        ammo: { name: "Magazine", lvl: 1, base: 20, max: 100 },
-        power: { name: "Propulsion", lvl: 1, base: 25, max: 100 },
-        bounce: { name: "Deflection", lvl: 1, base: 20, max: 100 },
-        cash: { name: "Data Cache", lvl: 1, base: 30, max: 100 }
-    };
-    const gun = { x: 150, y: 200, vx: 0, vy: 0, angle: 0, vAngle: 0, ammo: 0, max: 0 };
-    let parts = [], shells = [], rings = [];
-    function getGround(x) { return 400 + maps[curMap].fn(x); }
-    function load() { try { const s = localStorage.getItem('gs_save'); if(s) { const d = JSON.parse(s); wallet = d.w||0; shards = d.sh||0; curWeap = d.cw||'revolver'; curMap = d.cm||'hills'; for(let k in upgrades) upgrades[k].lvl = d.u[k]||1; for(let k in weapons) weapons[k].open = d.wo[k]!==undefined?d.wo[k]:weapons[k].open; for(let k in maps) maps[k].open = d.mo[k]!==undefined?d.mo[k]:maps[k].open; } } catch(e){ console.log("Storage restricted, running virtual data core."); } }
-    function save() { try { const wo={}, mo={}, u={}; for(let k in weapons) wo[k]=weapons[k].open; for(let k in maps) mo[k]=maps[k].open; for(let k in upgrades) u[k]=upgrades[k].lvl; localStorage.setItem('gs_save', JSON.stringify({w:wallet,sh:shards,cw:curWeap,cm:curMap,u,wo,mo})); } catch(e){} }
-    function prestige() { if(wallet < 2500) return; wallet = 0; shards++; for(let k in upgrades) upgrades[k].lvl = 1; for(let k in weapons) if(k!=='revolver') weapons[k].open = false; for(let k in maps) if(k!=='hills') maps[k].open = false; curWeap = 'revolver'; curMap = 'hills'; save(); sync(); }
-    function physics() {
-        if (state !== 'RUNNING') return; const m = maps[curMap]; let dt = tScale;
-        if (gun.ammo === 0 && isSlow) { if (tScale > 0.75) tScale -= 0.05; document.getElementById('slowmo-alert').style.display = 'block'; }
-        else { tScale = 1.0; document.getElementById('slowmo-alert').style.display = 'none'; }
-        gun.vy += m.grav * dt; gun.x += gun.vx * dt; gun.y += gun.vy * dt; gun.angle += gun.vAngle * dt;
-        gun.vx *= Math.pow(0.994, dt); gun.vy *= Math.pow(0.996, dt); gun.vAngle *= Math.pow(0.985, dt);
+
+        <div id="menu-modal">
+            <div class="menu-title">CYBER SPIN</div>
+            <div id="total-credits" class="menu-subtitle">CREDITS AVAILABLE: 0 CR (REBIRTHS: 0)</div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('upgrades')">SYSTEM UPGRADES</button>
+                <button class="tab-btn" onclick="switchTab('weapons')">WEAPON MODS</button>
+                <button class="tab-btn" onclick="switchTab('sectors')">SECTOR GRID</button>
+                <button class="tab-btn" onclick="switchTab('rebirth')" style="border-color:#e000ff; color:#e000ff;">QUANTUM REBIRTH</button>
+            </div>
+
+            <!-- Upgrades Grid -->
+            <div id="panel-upgrades" class="panel active">
+                <div class="grid-layout">
+                    <button class="cyber-btn" onclick="buyCoreUpgrade('ammo')">
+                        <div class="btn-header"><span>[+] MAX AMMO CAPACITY</span><span id="lvl-ammo">LVL 1</span></div>
+                        <div class="btn-meta">Increases baseline micro-battery chambers. (Max 100)</div>
+                        <div id="cost-ammo" class="price-tag">0 CR</div>
+                    </button>
+                    <button class="cyber-btn" onclick="buyCoreUpgrade('power')">
+                        <div class="btn-header"><span>[+] RECOIL IMPULSE</span><span id="lvl-power">LVL 1</span></div>
+                        <div class="btn-meta">Amplifies physical expulsion kinetics force. (Max 100)</div>
+                        <div id="cost-power" class="price-tag">0 CR</div>
+                    </button>
+                    <button class="cyber-btn" onclick="buyCoreUpgrade('spin')">
+                        <div class="btn-header"><span>[+] MOMENTUM TORQUE</span><span id="lvl-spin">LVL 1</span></div>
 Use code with caution.
-rings.forEach(r => { if(r.a) { let dx=gun.x-r.x, dy=gun.y-r.y, d=Math.sqrt(dxdx+dydy); if(d<42) { r.a=false; gun.vx+=14; gun.vy=-4; for(let i=0;i<10;i++) parts.push({x:r.x,y:r.y,vx:(Math.random()-0.5)8,vy:(Math.random()-0.5)8,l:20}); } } });
-let ground = getGround(gun.x);
-if (gun.y + 10 >= ground) {
-gun.y = ground - 10; let dx = 1, dy = getGround(gun.x + dx) - getGround(gun.x - dx), len = Math.sqrt(dydy + 1), nx = -dy/len, ny = 1/len, dot = gun.vxnx + gun.vyny;
-if (gun.vy > 0.4) { let b = Math.min(0.95, 0.38 * (1 + (upgrades.bounce.lvl - 1) * 0.08)); gun.vx = (gun.vx - 2 * dot * nx) * b; gun.vy = (gun.vy - 2 * dot * ny) * b; gun.vAngle += gun.vx * 0.012; }
-else { gun.vy = 0; gun.vx = 0.93; gun.vAngle = 0.85; }
+Enhances weapon gyro rotational speed vectors. (Max 100)
+0 CR
+
+
+[+] DATA EXTRACTIONLVL 1
+Extracts more credit bytes from travel meters. (Max 100)
+0 CR
+
+
+PRESTIGE SYSTEM CORE
+Tokens Owned: 0 Matrix Loops
+
+Rebirthing purges your dynamic credits and standard attribute module levels. In exchange, you get permanent Prestige Tokens.
+Each token grants a permanent +50% global credit extraction bonus.
+
+
+Requirement: Attain Level 40 or higher in at least one standard system upgrade slot.
+
+INITIALIZE PRESTIGE PREPARATION
+
+ENGAGE SYSTEM
+WIPE DEVICE PROFILE
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const ARSENAL = [
+{ id: 0, name: "P-12 NEON PISTOL", powerMod: 1.0, spinMod: 0.45, ammoMod: 0, color: "#00ffcc", price: 0 },
+{ id: 1, name: "BR-9 PULSE RIFLE", powerMod: 1.4, spinMod: 0.35, ammoMod: 2, color: "#ff007f", price: 300 },
+{ id: 2, name: "HEX-VOID SHOTGUN", powerMod: 2.2, spinMod: 0.70, ammoMod: -2, color: "#ffff00", price: 1200 }
+];
+const SECTORS = [
+{ id: 0, name: "METROPOLIS NEON CORE", gravity: 0.25, drag: 0.992, price: 0, skyGrad: "#050614", line: "#00ffcc", groundColor: "#080a1c" },
+{ id: 1, name: "ORBITAL ZERO STATION", gravity: 0.08, drag: 0.996, price: 500, skyGrad: "#020207", line: "#ff007f", groundColor: "#050512" },
+{ id: 2, name: "CYBERWASTE WASTELAND", gravity: 0.36, drag: 0.985, price: 1500, skyGrad: "#0c0410", line: "#ffff00", groundColor: "#14071c" }
+];
+const DEFAULT_STATE = {
+credits: 150,
+activeWeapon: 0,
+activeSector: 0,
+unlockedWeapons:,
+unlockedSectors:,
+upgrades: { ammo: 1, power: 1, spin: 1, bonus: 1 },
+rebirths: 0
+};
+let sysState = {};
+function loadProfileSave() {
+try {
+const raw = localStorage.getItem('cyber_spin_save_v1');
+if (raw) {
+const parsed = JSON.parse(raw);
+sysState = Object.assign({}, DEFAULT_STATE, parsed);
+if(!Array.isArray(sysState.unlockedWeapons)) sysState.unlockedWeapons =;
+if(!Array.isArray(sysState.unlockedSectors)) sysState.unlockedSectors =;
+} else {
+sysState = JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
-cameraX_real = cameraX_real + (gun.x - 200 - cameraX_real) * 0.1 * dt; cameraY_real = cameraY_real + (gun.y - 240 - cameraY_real) * 0.1 * dt;
-cameraX = cameraX_real; cameraY = cameraY_real;
-let dist = Math.max(0, Math.floor(gun.x / 10) - 15); payout = Math.floor((dist + (upgrades.cash.lvl - 1) * 10) * (1 + shards * 0.2));
-document.getElementById('dist-ui').innerText = DISTANCE // ${String(dist).padStart(4,'0')}m; document.getElementById('bank-ui').innerText = CREDITS // ${String(payout).padStart(4,'0')}; document.getElementById('ammo-ui').innerText = AMMO // ${gun.ammo}/${gun.max};
-parts.forEach((p, i) => { p.x += p.vx * dt; p.y += p.vy * dt; p.l -= dt; if (p.l <= 0) parts.splice(i, 1); });
-shells.forEach((s, i) => { s.vy += m.grav * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.a += s.va * dt; if(s.y>=getGround(s.x)){s.y=getGround(s.x);s.vy=-s.vy0.3;s.vx=0.6;} s.l -= dt; if (s.l <= 0) shells.splice(i, 1); });
-if (Math.abs(gun.vx) < 0.12 && gun.ammo === 0 && Math.abs(gun.y - getGround(gun.x)) < 15) endRun(dist);
+} catch(e) {
+sysState = JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
-function shoot() {
-if (gun.ammo <= 0) return; gun.ammo--; if (gun.ammo === 0) isSlow = true;
-let f = weapons[curWeap].force * (1 + (upgrades.power.lvl - 1) * 0.045) * (1 + shards * 0.15);
-gun.vx += (gun.vx <= 0 ? Math.cos(gun.angle)f0.85 : Math.cos(gun.angle)f) + Math.cos(gun.angle+Math.PI)-f; gun.vy += Math.sin(gun.angle+Math.PI)-f; gun.vAngle += (Math.random()0.25+0.12)(Math.cos(gun.angle)>0?-1:1);
-for (let i = 0; i < 6; i++) parts.push({ x: gun.x+Math.cos(gun.angle)-12, y: gun.y+Math.sin(gun.angle)-12, vx: Math.cos(gun.angle)*-6+(Math.random()-0.5)3, vy: Math.sin(gun.angle)-6+(Math.random()-0.5)*3, l: 15 });
-shells.push({ x: gun.x, y: gun.y, vx: Math.cos(gun.angle+Math.PI/2)*3+(Math.random()-0.5)2, vy: -3, a: Math.random(), va: 0.2, l: 120 });
 }
-document.getElementById('game-container').addEventListener('mousedown', e => { if(!e.target.closest('button') && !e.target.closest('.card') && !e.target.closest('.item') && state==='RUNNING') shoot(); });
-function draw() {
+function writeProfileSave() {
+localStorage.setItem('cyber_spin_save_v1', JSON.stringify(sysState));
+}
+function clearProfileSave() {
+if(confirm("Confirm critical protocol: Purge device data permanent record?")) {
+localStorage.removeItem('cyber_spin_save_v1');
+sysState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+updateTerminalUI();
+alert("Profile reset successful.");
+}
+}
+let run = {
+active: false,
+x: 100, y: 220, vx: 0, vy: 0,
+angle: 0, vAngle: 0,
+ammoLeft: 0, maxDistance: 0,
+groundY: 440, rings: []
+};
+let FXParticles = [];
+let stars = [];
+for(let i=0; i<80; i++) {
+stars.push({x: Math.random() * canvas.width, y: Math.random() * 260, r: Math.random() * 1.5 + 0.5, alpha: Math.random() * 0.5 + 0.3});
+}
+function switchTab(tabId) {
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+if (event && event.target) {
+event.target.classList.add('active');
+}
+document.getElementById(panel-${tabId}).classList.add('active');
+}
+function getUpgradeCost(type, currentLvl) {
+if(currentLvl >= 100) return Infinity;
+let base = type === 'ammo' ? 40 : type === 'power' ? 50 : type === 'spin' ? 35 : 60;
+return Math.floor(base * Math.pow(1.08, currentLvl - 1));
+}
+function updateTerminalUI() {
+document.getElementById('distance-ui').innerText = SECTOR NODE: ${Math.floor(run.x - 100)}m;
+document.getElementById('ammo-ui').innerText = CELL CHARGE: ${run.ammoLeft};
+document.getElementById('coins-ui').innerText = CREDITS: ${sysState.credits};
+document.getElementById('total-credits').innerText = CREDITS AVAILABLE: ${sysState.credits} CR (REBIRTH LEAP: ${sysState.rebirths});
+document.getElementById('rebirth-status').innerText = Active Prestige Tokens: ${sysState.rebirths} Loop Matrix (+${sysState.rebirths * 50}% Credits Multiplier);
+['ammo', 'power', 'spin', 'bonus'].forEach(type => {
+let lvl = sysState.upgrades[type];
+let cost = getUpgradeCost(type, lvl);
+document.getElementById(lvl-${type}).innerText = lvl >= 100 ? "MAX" : LVL ${lvl};
+document.getElementById(cost-${type}).innerText = lvl >= 100 ? "TERMINAL" : ${cost} CR;
+document.getElementById(cost-${type}).parentNode.disabled = (sysState.credits < cost || lvl >= 100);
+});
+let eligible = (sysState.upgrades.ammo >= 40 || sysState.upgrades.power >= 40 || sysState.upgrades.spin >= 40 || sysState.upgrades.bonus >= 40);
+document.getElementById('rebirth-action-btn').disabled = !eligible;
+if(!eligible) {
+document.getElementById('rebirth-action-btn').innerText = "SYSTEM INELIGIBLE (NEED LVL 40)";
+} else {
+document.getElementById('rebirth-action-btn').innerText = "EXECUTE REBIRTH IMPULSE (+1 TOKEN)";
+}
+renderLists();
+}
+function buyCoreUpgrade(type) {
+let currentLvl = sysState.upgrades[type];
+if (currentLvl >= 100) return;
+let cost = getUpgradeCost(type, currentLvl);
+if (sysState.credits >= cost) {
+sysState.credits -= cost;
+sysState.upgrades[type]++;
+writeProfileSave();
+updateTerminalUI();
+}
+}
+function triggerQuantumRebirth() {
+let eligible = (sysState.upgrades.ammo >= 40 || sysState.upgrades.power >= 40 || sysState.upgrades.spin >= 40 || sysState.upgrades.bonus >= 40);
+if(!eligible) return;
+if(confirm("Confirm extraction procedure? This returns module levels back to baseline 1!")) {
+sysState.rebirths += 1;
+sysState.credits = 150;
+sysState.upgrades = { ammo: 1, power: 1, spin: 1, bonus: 1 };
+writeProfileSave();
+updateTerminalUI();
+switchTab('upgrades');
+alert("Quantum Rebirth Complete. Hyper-extraction values initialized.");
+}
+}
+function renderLists() {
+let wHTML = "";
+ARSENAL.forEach(w => {
+let isUnlocked = sysState.unlockedWeapons.includes(w.id);
+let isEquipped = sysState.activeWeapon === w.id;
+let btnLabel = isEquipped ? "EQUIPPED" : isUnlocked ? "EQUIP" : BUY [${w.price} CR];
+let disabledStr = (isEquipped || (!isUnlocked && sysState.credits < w.price)) ? "disabled" : "";
+wHTML += <div class="select-item ${isEquipped ? 'equipped' : ''}"> <div> <div style="font-weight:bold; color:${w.color};">${w.name}</div> <div style="font-size:11px; color:#aaa;">Expulsion Mod: x${w.powerMod} | Gyro Force: x${w.spinMod}</div> </div> <button class="select-action-btn" ${disabledStr} onclick="interactWeapon(${w.id})">${btnLabel}</button> </div>;
+});
+document.getElementById('weapon-list').innerHTML = wHTML;
+let sHTML = "";
+SECTORS.forEach(s => {
+let isUnlocked = sysState.unlockedSectors.includes(s.id);
+let isEquipped = sysState.activeSector === s.id;
+let btnLabel = isEquipped ? "ACTIVE" : isUnlocked ? "ENTER" : DECRYPT [${s.price} CR];
+let disabledStr = (isEquipped || (!isUnlocked && sysState.credits < s.price)) ? "disabled" : "";
+sHTML += <div class="select-item ${isEquipped ? 'equipped' : ''}"> <div> <div style="font-weight:bold; color:${s.line};">${s.name}</div> <div style="font-size:11px; color:#aaa;">Gravitational Constant: ${s.gravity}G</div> </div> <button class="select-action-btn" ${disabledStr} onclick="interactSector(${s.id})">${btnLabel}</button> </div>;
+});
+document.getElementById('sector-list').innerHTML = sHTML;
+}
+function interactWeapon(id) {
+if (sysState.unlockedWeapons.includes(id)) {
+sysState.activeWeapon = id;
+} else {
+let w = ARSENAL.find(item => item.id === id);
+if (sysState.credits >= w.price) {
+sysState.credits -= w.price;
+sysState.unlockedWeapons.push(id);
+sysState.activeWeapon = id;
+}
+}
+writeProfileSave();
+updateTerminalUI();
+}
+function interactSector(id) {
+if (sysState.unlockedSectors.includes(id)) {
+sysState.activeSector = id;
+} else {
+let s = SECTORS.find(item => item.id === id);
+if (sysState.credits >= s.price) {
+sysState.credits -= s.price;
+sysState.unlockedSectors.push(id);
+sysState.activeSector = id;
+}
+}
+writeProfileSave();
+updateTerminalUI();
+}
+function generateRingsForRun() {
+run.rings = [];
+for (let i = 500; i < 60000; i += Math.floor(Math.random() * 400) + 400) {
+run.rings.push({ x: i, y: 100 + Math.random() * 200, radius: 35, triggered: false });
+}
+}
+function triggerSequenceStart() {
+document.getElementById('menu-modal').style.display = 'none';
+let weapon = ARSENAL.find(w => w.id === sysState.activeWeapon);
+run.active = true;
+run.x = 100; run.y = 220; run.vx = 0; run.vy = 0;
+run.angle = -3 * Math.PI / 4;
+run.vAngle = 0;
+run.ammoLeft = Math.max(1, sysState.upgrades.ammo + weapon.ammoMod);
+run.maxDistance = 0;
+generateRingsForRun();
+FXParticles = [];
+}
+function terminateSequence() {
+run.active = false;
+let flightDistance = Math.floor(run.maxDistance - 100);
+if (flightDistance < 0) flightDistance = 0;
+let basicEarnings = flightDistance * 0.25;
+let upgradeMultiplier = 1 + (sysState.upgrades.bonus * 0.1);
+let prestigeMultiplier = 1 + (sysState.rebirths * 0.50);
+sysState.credits += Math.floor(basicEarnings * upgradeMultiplier * prestigeMultiplier);
+writeProfileSave();
+document.getElementById('menu-modal').style.display = 'flex';
+updateTerminalUI();
+}
+function processWeaponDischarge() {
+if (!run.active || run.ammoLeft <= 0) return;
+run.ammoLeft--;
+let w = ARSENAL.find(item => item.id === sysState.activeWeapon);
+let totalPower = (9.5 + (sysState.upgrades.power * 0.38)) * w.powerMod;
+let totalTorque = (1.2 + (sysState.upgrades.spin * 0.08)) * w.spinMod;
+run.vx += -Math.cos(run.angle) * totalPower;
+run.vy += -Math.sin(run.angle) * totalPower;
+run.vAngle += totalTorque;
+for (let i = 0; i < 15; i++) {
+FXParticles.push({
+x: run.x + Math.cos(run.angle) * 35, y: run.y + Math.sin(run.angle) * 35,
+vx: Math.cos(run.angle) * 10 + (Math.random() - 0.5) * 6,
+vy: Math.sin(run.angle) * 10 + (Math.random() - 0.5) * 6,
+life: 1.0, color: w.color
+});
+}
+}
+window.addEventListener('mousedown', (e) => {
+if (document.getElementById('menu-modal').style.display !== 'none') return;
+processWeaponDischarge();
+});
+window.addEventListener('touchstart', (e) => {
+if (document.getElementById('menu-modal').style.display !== 'none') return;
+processWeaponDischarge();
+});
+function frameTick() {
+let sector = SECTORS.find(s => s.id === sysState.activeSector);
+let currentWeapon = ARSENAL.find(w => w.id === sysState.activeWeapon);
 ctx.clearRect(0, 0, canvas.width, canvas.height);
-rings.forEach(r => { if(r.a) { ctx.save(); ctx.strokeStyle = "#00ffcc"; ctx.lineWidth = 4; ctx.shadowColor = "#00ffcc"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(r.x-cameraX, r.y-cameraY, 30, 0, Math.PI2); ctx.stroke(); ctx.restore(); } });
-ctx.strokeStyle = maps[curMap].color; ctx.lineWidth = 3; ctx.beginPath();
-for (let px = 0; px < canvas.width + 40; px += 10) { let wx = cameraX + px, wy = getGround(wx) - cameraY; if (px === 0) ctx.moveTo(px, wy); else ctx.lineTo(px, wy); } ctx.stroke();
-ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,240,255,0.06)";
-for (let gx = Math.floor(cameraX/40)*40; gx < cameraX+canvas.width+40; gx += 40) { let sx = gx-cameraX, gy = getGround(gx)-cameraY; ctx.beginPath(); ctx.moveTo(sx, gy); ctx.lineTo(sx, gy+80); ctx.stroke(); if(gx%120===0 && gx/10-15>=0) { ctx.fillStyle="rgba(255,255,255,0.2)"; ctx.font="9px monospace"; ctx.fillText(${Math.floor(gx/10-15)}m, sx+4, gy+15); } }
-parts.forEach(p => { ctx.fillStyle = rgba(0,255,204,${p.l/15}); ctx.fillRect(p.x-cameraX, p.y-cameraY, 4, 4); });
-shells.forEach(s => { ctx.save(); ctx.translate(s.x-cameraX, s.y-cameraY); ctx.rotate(s.a); ctx.fillStyle = "#f1c40f"; ctx.fillRect(-3,-1,5,2); ctx.restore(); });
-ctx.save(); ctx.translate(gun.x-cameraX, gun.y-cameraY); ctx.rotate(gun.angle); weapons[curWeap].draw(ctx); ctx.restore();
+if (run.active) {
+run.vy += sector.gravity;
+run.vx *= sector.drag;
+run.vy *= sector.drag;
+run.vAngle *= 0.988;
+run.x += run.vx; run.y += run.vy; run.angle += run.vAngle;
+if (run.x > run.maxDistance) run.maxDistance = run.x;
+run.rings.forEach(ring => {
+if (!ring.triggered) {
+let dx = run.x - ring.x; let dy = run.y - ring.y;
+let range = Math.sqrt(dx * dx + dy * dy);
+if (range < ring.radius + 15) {
+ring.triggered = true;
+run.vx += 15; run.vy = -2.5; run.vAngle += 0.8;
+for(let k=0; k<20; k++) {
+FXParticles.push({
+x: ring.x, y: ring.y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 1.2, color: "#00ffcc"
+});
 }
-function loop() { physics(); draw(); requestAnimationFrame(loop); }
-function start() {
-let w = weapons[curWeap]; gun.max = w.ammo + (upgrades.ammo.lvl - 1); gun.ammo = gun.max; gun.x = 150; gun.y = getGround(gun.x) - 30; gun.vx = 3.5; gun.vy = -2.5; gun.angle = Math.PI; gun.vAngle = -0.08; cameraX = 0; cameraY = 0; cameraX_real = 0; cameraY_real = 0; timeScale = 1.0; isSlow = false; parts = []; shells = []; rings = [];
-for (let i = 1; i <= 40; i++) rings.push({ x: 500 + i * (400 + Math.random()*300), y: 100 + Math.random()*180, a: true });
-state = 'RUNNING'; document.getElementById('shop').style.display = 'none';
 }
-function endRun(d) { state = 'SHOP'; wallet += payout; save(); document.getElementById('slowmo-alert').style.display = 'none'; document.getElementById('shop').style.display = 'flex'; let f = document.getElementById('last-run'); f.style.display = 'inline-block'; f.innerHTML = PREVIOUS RUN: ${d}m // EARNED: +${payout} CR; sync(); }
-function selectWeap(k) { let w = weapons[k]; if (!w.open && wallet >= w.cost) { wallet -= w.cost; w.open = true; curWeap = k; } else if (w.open) curWeap = k; save(); sync(); }
-function selectMap(k) { let m = maps[k]; if (!m.open && wallet >= m.cost) { wallet -= m.cost; m.open = true; curMap = k; } else if (m.open) curMap = k; save(); sync(); }
-function buyUp(k) { let u = upgrades[k], c = Math.floor(u.base + ((u.lvl - 1) * 8)); if (wallet >= c && u.lvl < u.max) { wallet -= c; u.lvl++; save(); sync(); } }
-function sync() {
-document.getElementById('ui-wallet').innerText = wallet; document.getElementById('ui-shards').innerText = shards;
-let rBtn = document.getElementById('rebirth-btn'); rBtn.className = wallet >= 2500 ? '' : 'disabled'; rBtn.innerText = wallet >= 2500 ? 'REBIRTH (+1 SHARD)' : 'REBIRTH (2500 CR)';
-let wRow = document.getElementById('weap-row'); wRow.innerHTML = ''; for (let k in weapons) wRow.innerHTML += <div class="card ${!weapons[k].open?'locked':''} ${curWeap===k?'active':''}" onclick="selectWeap('${k}')"><span class="c-name">${weapons[k].name.toUpperCase()}</span><span class="c-stat">${!weapons[k].open?weapons[k].cost+' CR':(curWeap===k?'ACTIVE':'EQUIP')}</span></div>;
-let mRow = document.getElementById('map-row'); mRow.innerHTML = ''; for (let k in maps) mRow.innerHTML += <div class="card ${!maps[k].open?'locked':''} ${curMap===k?'active':''}" onclick="selectMap('${k}')"><span class="c-name">${maps[k].name.toUpperCase()}</span><span class="c-stat">${!maps[k].open?maps[k].cost+' CR':(curMap===k?'ONLINE':'LAUNCH')}</span></div>;
-let uGrid = document.getElementById('up-grid'); uGrid.innerHTML = ''; for (let k in upgrades) { let u = upgrades[k], c = Math.floor(u.base + ((u.lvl - 1) * 8)); uGrid.innerHTML += <div class="item ${u.lvl>=u.max?'disabled':''}" onclick="buyUp('${k}')"><span class="i-name">${u.name.toUpperCase()}</span><span class="i-lvl">Lvl ${u.lvl}/100</span><span class="i-cost">${u.lvl>=u.max?'MAX':c+' CR'}</span></div>; }
 }
-window.onload = function() {
-load();
+});
+if (run.y >= run.groundY - 15) {
+run.y = run.groundY - 15;
+if (run.vy > 1) { run.vy = -run.vy * 0.32; run.vx *= 0.75; }
+else { run.vy = 0; run.vx *= 0.93; }
+if (Math.abs(run.vx) < 0.15 && run.ammoLeft === 0) terminateSequence();
+}
+}
+let viewOffset = run.active ? run.x - 160 : 0;
+ctx.fillStyle = sector.skyGrad;
+ctx.fillRect(0, 0, canvas.width, run.groundY);
+if (sysState.activeSector === 0) {
+let p1Offset = -(viewOffset * 0.15) % 400;
+ctx.fillStyle = "rgba(10, 14, 38, 0.45)";
+for (let bx = p1Offset - 100; bx < canvas.width + 400; bx += 220) {
+ctx.fillRect(bx, run.groundY - 180, 140, 180);
+}
+let p2Offset = -(viewOffset * 0.4) % 500;
+ctx.fillStyle = "rgba(19, 22, 54, 0.8)";
+for (let bx = p2Offset - 100; bx < canvas.width + 500; bx += 280) {
+ctx.fillRect(bx, run.groundY - 240, 180, 240);
+}
+} else {
+stars.forEach(s => {
+ctx.fillStyle = rgba(255, 255, 255, ${s.alpha});
+ctx.fillRect((s.x - viewOffset * 0.05 + canvas.width) % canvas.width, s.y, s.r, s.r);
+});
+}
+ctx.fillStyle = sector.groundColor;
+ctx.fillRect(0, run.groundY, canvas.width, canvas.height - run.groundY);
+ctx.strokeStyle = sector.line; ctx.lineWidth = 4;
+ctx.beginPath(); ctx.moveTo(0, run.groundY); ctx.lineTo(canvas.width, run.groundY); ctx.stroke();
+let firstVisibleFlag = Math.floor(viewOffset / 200) * 200;
+for (let f = firstVisibleFlag; f < firstVisibleFlag + canvas.width + 300; f += 200) {
+let flagX = f - viewOffset;
+ctx.fillStyle = "rgba(255, 0, 127, 0.15)"; ctx.fillRect(flagX, run.groundY - 45, 2, 45);
+ctx.fillStyle = sector.line; ctx.font = "10px 'Courier New'"; ctx.fillText([NODE ${f}m], flagX + 6, run.groundY - 30);
+}
+run.rings.forEach(ring => {
+let rx = ring.x - viewOffset;
+if (rx > -100 && rx < canvas.width + 100) {
+ctx.strokeStyle = ring.triggered ? "rgba(255, 255, 255, 0.12)" : "#00ffcc";
+ctx.lineWidth = 4;
+ctx.beginPath(); ctx.arc(rx, ring.y, ring.radius, 0, Math.PI * 2); ctx.stroke();
+}
+});
+for (let i = FXParticles.length - 1; i >= 0; i--) {
+let p = FXParticles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.03;
+if (p.life <= 0) { FXParticles.splice(i, 1); continue; }
+ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+ctx.beginPath(); ctx.arc(p.x - viewOffset, p.y, 5 * p.life, 0, Math.PI * 2); ctx.fill();
+ctx.globalAlpha = 1.0;
+}
+ctx.save();
+ctx.translate(run.x - viewOffset, run.y); ctx.rotate(run.angle);
+ctx.fillStyle = "#15182d"; ctx.strokeStyle = currentWeapon.color; ctx.lineWidth = 2;
+ctx.fillRect(-18, -6, 42, 12); ctx.strokeRect(-18, -6, 42, 12);
+ctx.fillStyle = "#070914"; ctx.fillRect(-15, 6, 8, 16); ctx.strokeRect(-15, 6, 8, 16);
+ctx.fillStyle = currentWeapon.color; ctx.fillRect(0, -2, 18, 4);
+ctx.restore();
+requestAnimationFrame(frameTick);
+}
+loadProfileSave();
+updateTerminalUI();
+frameTick();
 sync();
 loop();
 };
